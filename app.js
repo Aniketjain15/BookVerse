@@ -9,7 +9,13 @@ const order = require("./routes/order");
 require("dotenv").config();
 
 const PORT = process.env.PORT || 1000;
-app.use(cors());
+
+// Allow only your Netlify frontend
+app.use(cors({
+  origin: 'https://ubiquitous-klepon-2c7808.netlify.app',
+  credentials: true
+}));
+
 app.use(express.json());
 
 //Connection
