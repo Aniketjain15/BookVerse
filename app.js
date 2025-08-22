@@ -9,7 +9,7 @@ const order = require("./routes/order");
 require("dotenv").config();
 
 const PORT = process.env.PORT || 1000;
-const apiKey = process.env.GEMINI_API_KEY;
+
 // Allow only your Netlify frontend
 app.use(cors({
   origin: 'https://effulgent-empanada-020b5f.netlify.app',
