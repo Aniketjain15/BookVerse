@@ -4,24 +4,28 @@ const { authenticateToken } = require("./userAuth");
 const User = require("../models/user");
 
 //create book -- admin
-router.post("/add-book", authenticateToken, async (req, res) => {
+router.post("/add-book", async (req, res) => {
   try {
-    const book = new Book({
-      url: req.body.url,
-      title: req.body.title,
-      author: req.body.author,
-      price: req.body.price,
-      desc: req.body.desc,
-      language: req.body.language,
+    const { url, title, author, price, desc, language, rating } = req.body;
+
+    if (!url || !title || !author || !price || !desc || !language) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    const newBook = new Book({
+      url,
+      title,
+      author,
+      price,
+      desc,
+      language,
+      rating: rating || 0, // ⭐ default 0
     });
-    await book.save();
-    return res.json({
-      status: "Success",
-      message: "Book added successfully!",
-    });
+
+    await newBook.save();
+    res.status(201).json({ message: "Book added successfully" });
   } catch (error) {
-    console.log(error);
-    return res.status(500).json({ message: "An error occurred" });
+    res.status(500).json({ message: "Server error" });
   }
 });
 
@@ -47,7 +51,28 @@ router.put("/update-book", authenticateToken, async (req, res) => {
     return res.status(500).json({ message: "An error occurred" });
   }
 });
+router.put("/update-book", async (req, res) => {
+  try {
+    const { bookid } = req.headers;
+    const { url, title, author, price, desc, language, rating } = req.body;
 
+    if (!url || !title || !author || !price || !desc || !language || rating === undefined) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    const updatedBook = await Book.findByIdAndUpdate(
+      bookid,
+      { url, title, author, price, desc, language, rating },
+      { new: true }
+    );
+
+    if (!updatedBook) return res.status(404).json({ message: "Book not found" });
+
+    res.status(200).json({ message: "Book updated successfully", data: updatedBook });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
 //delete book --admin
 router.delete("/delete-book", authenticateToken, async (req, res) => {
   try {
