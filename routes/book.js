@@ -117,18 +117,52 @@ router.get("/get-recent-books", async (req, res) => {
 });
 
 //get book by id
+// router.get("/get-book-by-id/:id", async (req, res) => {
+//   try {
+//     const { id } = req.params;
+//     const book = await Book.findById(id);
+//     return res.json({
+//       status: "Success",
+//       data: book,
+//     });
+//   } catch (error) {
+//     console.log(error);
+//     return res.status(500).json({ message: "An error occurred" });
+//   }
+// });
+
+// module.exports = router;
+// 📌 Get Book by ID (with rating)
 router.get("/get-book-by-id/:id", async (req, res) => {
   try {
     const { id } = req.params;
+
     const book = await Book.findById(id);
-    return res.json({
+
+    if (!book) {
+      return res.status(404).json({
+        status: "Fail",
+        message: "Book not found",
+      });
+    }
+
+    return res.status(200).json({
       status: "Success",
-      data: book,
+      data: {
+        _id: book._id,
+        title: book.title,
+        author: book.author,
+        price: book.price,
+        url: book.url,
+        rating: book.rating || 0, // ✅ always include rating
+        description: book.description || "",
+      },
     });
   } catch (error) {
-    console.log(error);
-    return res.status(500).json({ message: "An error occurred" });
+    console.error("Error fetching book by ID:", error);
+    return res.status(500).json({
+      status: "Error",
+      message: "Internal Server Error",
+    });
   }
 });
-
-module.exports = router;
