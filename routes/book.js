@@ -30,49 +30,22 @@ router.post("/add-book", async (req, res) => {
 });
 
 //update book --admin
-router.put("/update-book", authenticateToken, async (req, res) => {
-  try {
-    const { bookid } = req.headers;
-    await Book.findByIdAndUpdate(bookid, {
-      url: req.body.url,
-      title: req.body.title,
-      author: req.body.author,
-      price: req.body.price,
-      desc: req.body.desc,
-      language: req.body.language,
-    });
-
-    return res.json({
-      status: "Success",
-      message: "Book Updated successfully!",
-    });
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json({ message: "An error occurred" });
-  }
-});
 router.put("/update-book", async (req, res) => {
   try {
-    const { bookid } = req.headers;
-    const { url, title, author, price, desc, language, rating } = req.body;
-
-    if (!url || !title || !author || !price || !desc || !language || rating === undefined) {
-      return res.status(400).json({ message: "All fields are required" });
-    }
+    const { bookid, url, title, author, price, desc, language, rating } = req.body;
 
     const updatedBook = await Book.findByIdAndUpdate(
       bookid,
-      { url, title, author, price, desc, language, rating },
+      { url, title, author, price, desc, language, rating },  // ✅ include rating
       { new: true }
     );
 
-    if (!updatedBook) return res.status(404).json({ message: "Book not found" });
-
-    res.status(200).json({ message: "Book updated successfully", data: updatedBook });
-  } catch (error) {
-    res.status(500).json({ message: "Server error" });
+    res.json({ status: "Success", message: "Book updated", data: updatedBook });
+  } catch (err) {
+    res.status(500).json({ message: "Update failed" });
   }
 });
+
 //delete book --admin
 router.delete("/delete-book", authenticateToken, async (req, res) => {
   try {
