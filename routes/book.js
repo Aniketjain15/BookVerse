@@ -6,7 +6,7 @@ const User = require("../models/user");
 //create book -- admin
 router.post("/add-book", async (req, res) => {
   try {
-    const { url, title, author, price, desc, language, rating } = req.body;
+    const { url, title, author, price, desc, language } = req.body;
 
     if (!url || !title || !author || !price || !desc || !language) {
       return res.status(400).json({ message: "All fields are required" });
@@ -19,7 +19,7 @@ router.post("/add-book", async (req, res) => {
       price,
       desc,
       language,
-      rating: rating || 0, // ⭐ default 0
+     
     });
 
     await newBook.save();
@@ -32,11 +32,11 @@ router.post("/add-book", async (req, res) => {
 //update book --admin
 router.put("/update-book", async (req, res) => {
   try {
-    const { bookid, url, title, author, price, desc, language, rating } = req.body;
+    const { bookid, url, title, author, price, desc, language} = req.body;
 
     const updatedBook = await Book.findByIdAndUpdate(
       bookid,
-      { url, title, author, price, desc, language, rating },  // ✅ include rating
+      { url, title, author, price, desc, language },  // ✅ include rating
       { new: true }
     );
 
@@ -45,6 +45,7 @@ router.put("/update-book", async (req, res) => {
     res.status(500).json({ message: "Update failed" });
   }
 });
+
 
 //delete book --admin
 router.delete("/delete-book", authenticateToken, async (req, res) => {
@@ -90,52 +91,18 @@ router.get("/get-recent-books", async (req, res) => {
 });
 
 //get book by id
-// router.get("/get-book-by-id/:id", async (req, res) => {
-//   try {
-//     const { id } = req.params;
-//     const book = await Book.findById(id);
-//     return res.json({
-//       status: "Success",
-//       data: book,
-//     });
-//   } catch (error) {
-//     console.log(error);
-//     return res.status(500).json({ message: "An error occurred" });
-//   }
-// });
-
-// module.exports = router;
-// 📌 Get Book by ID (with rating)
 router.get("/get-book-by-id/:id", async (req, res) => {
   try {
     const { id } = req.params;
-
     const book = await Book.findById(id);
-
-    if (!book) {
-      return res.status(404).json({
-        status: "Fail",
-        message: "Book not found",
-      });
-    }
-
-    return res.status(200).json({
+    return res.json({
       status: "Success",
-      data: {
-        _id: book._id,
-        title: book.title,
-        author: book.author,
-        price: book.price,
-        url: book.url,
-        rating: book.rating || 0, // ✅ always include rating
-        description: book.description || "",
-      },
+      data: book,
     });
   } catch (error) {
-    console.error("Error fetching book by ID:", error);
-    return res.status(500).json({
-      status: "Error",
-      message: "Internal Server Error",
-    });
+    console.log(error);
+    return res.status(500).json({ message: "An error occurred" });
   }
 });
+
+module.exports = router;

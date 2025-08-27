@@ -26,7 +26,7 @@ const book = new mongoose.Schema(
       type: String,
       required: true,
     },
-     rating: { type: Number, required: true, default: 0 }
+     rating: { type: Number, min: 0, max: 5, default: 0 }, 
 
   },
   { timestamps: true }
