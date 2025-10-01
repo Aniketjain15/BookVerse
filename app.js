@@ -174,3 +174,9 @@ app.use("/api/v1", order);
 app.listen(PORT, () => {
   console.log(`✅ Server Started at PORT: ${PORT}`);
 });
+
+
+// Health check endpoint
+app.get("/ping", (req, res) => {
+  res.status(200).send("OK");
+});
